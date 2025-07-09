@@ -1,0 +1,128 @@
+body {
+  font-family: 'Comic Sans MS', cursive, sans-serif;
+  background: linear-gradient(180deg, #fff7f0 0%, #ffe0e5 100%);
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: start;
+  padding: 20px;
+  overflow: hidden;
+}
+
+input, button {
+  margin: 8px;
+  padding: 12px 15px;
+  border-radius: 12px;
+  border: 1px solid #ddd;
+  outline: none;
+  transition: all 0.3s ease;
+}
+
+input:focus {
+  border-color: #f5a9bc;
+  box-shadow: 0 0 5px #f5a9bc;
+}
+
+button {
+  background: #ffe2ec;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #ffd6e0;
+}
+
+h2 {
+  font-size: 32px;
+  color: #a15c78;
+  margin-bottom: 15px;
+}
+
+.page {
+  background: #fff8f0;
+  border-radius: 15px;
+  box-shadow: 0 0 10px #f3c7b5;
+}
+
+input::placeholder {
+  color: #b28b94;
+}
+
+.robot {
+  animation: bounce 3s ease-in-out infinite;
+  filter: drop-shadow(1px 2px 3px #afd5f6);
+}
+
+.speech-bubble {
+  max-width: 100px;
+  background: #cce7ff;
+  color: #333;
+  padding: 15px 20px;
+  border-radius: 20px;
+  font-family: "Comic Sans MS", cursive, sans-serif;
+  font-size:0.87rem;
+  position: relative;
+  animation: popIn 1s ease forwards, floatBubble 3s ease-in-out infinite;
+  opacity: 0;
+  margin-bottom: 120px;
+  box-shadow: 2px 4px 10px #afd5f6;
+}
+
+.speech-bubble::after {
+  content: "";
+  position: absolute;
+  left: -15px;
+  top: 50%;
+  transform: translateY(-50%);
+  border: 10px solid transparent;
+  border-right-color: #cce7ff;
+}
+
+.speech-bubble-two {
+  max-width: 100px;
+  background: #cce7ff;
+  color: #333;
+  padding: 15px 20px;
+  border-radius: 20px;
+  font-family: "Comic Sans MS", cursive, sans-serif;
+  font-size:0.87rem;
+  position: relative;
+  animation: popIn 1s ease forwards, floatBubble 3s ease-in-out infinite;
+  opacity: 0;
+  margin-bottom: 120px;
+  margin-right: 150px;
+  box-shadow: 2px 4px 10px #afd5f6;
+}
+
+.speech-bubble-two::after {
+  content: "";
+  position: absolute;
+  left: -15px;
+  top: 50%;
+  transform: translateY(-50%);
+  border: 10px solid transparent;
+  border-right-color: #cce7ff;
+}
+
+
+
+/* Animation keyframes */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translate(-30px, -50%); }
+  to { opacity: 1; transform: translate(0, -50%); }
+}
+
+@keyframes popIn {
+  0% { transform: scale(0.5); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
+}
+
+@keyframes floatBubble {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
+}
