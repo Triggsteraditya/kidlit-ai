@@ -5,23 +5,22 @@ from azure.core.credentials import AzureKeyCredential
 from azure.ai.inference import ChatCompletionsClient
 from azure.ai.inference.models import UserMessage
 import os
-import replicate
-from datetime import datetime
 
 # Load environment variables
 load_dotenv()
 AZURE_ENDPOINT = os.getenv("AZURE_ENDPOINT")
 AZURE_KEY = os.getenv("AZURE_KEY")
 GPT_MODEL = os.getenv("GPT_MODEL")
-REPLICATE_API_TOKEN = os.getenv("REPLICATE_API_TOKEN")
-REPLICATE_MODEL = os.getenv("REPLICATE_MODEL_NAME", "vectradmin/sdxl-v-transparent")
 
 # Initialize clients
 app = Flask(__name__)
 CORS(app)
 credential = AzureKeyCredential(AZURE_KEY)
 chat_client = ChatCompletionsClient(endpoint=AZURE_ENDPOINT, credential=credential)
-replicate_client = replicate.Client(api_token=REPLICATE_API_TOKEN)
+
+@app.route("/", methods=["GET"])
+def home():
+    return "🎉 KidLit AI Backend is running!"
 
 @app.route("/generate_story", methods=["POST"])
 def generate_story():
@@ -59,29 +58,14 @@ Once upon a time..."""
         pages = []
         for i in range(0, len(words), 40):
             chunk = " ".join(words[i:i+40])
-            try:
-                output = replicate_client.run(
-                    f"{REPLICATE_MODEL}:latest",
-                    input={
-                        "prompt": f"Studio Ghibli style, isolated transparent PNG illustration of: {chunk}",
-                        "width": 512,
-                        "height": 512,
-                        "output_format": "png"
-                    }
-                )
-                image_url = output[0] if isinstance(output, list) else output
-            except Exception as e:
-                print("Image generation error:", e)
-                image_url = ""
-
             pages.append({
                 "text": chunk,
-                "image_url": image_url
+                "image_url": ""  # placeholder for future image
             })
 
         return jsonify({
             "title": title.strip(),
-            "cover_image": pages[0]["image_url"] if pages else "",
+            "cover_image": "",  # placeholder for future cover
             "pages": pages
         })
 
