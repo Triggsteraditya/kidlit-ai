@@ -43,7 +43,6 @@ function App() {
   const [age, setAge] = useState('');
   const [theme, setTheme] = useState('');
   const [loading, setLoading] = useState(false);
-
   const navigate = useNavigate();
 
   const generateStory = async () => {
@@ -62,23 +61,18 @@ function App() {
 
       const data = await response.json();
 
-      if (!data.title || !data.pages) {
-        throw new Error("Invalid story structure");
+      if (data?.title && data?.pages) {
+        localStorage.setItem("storybook_title", data.title);
+        localStorage.setItem("storybook_pages", JSON.stringify(data.pages));
+        localStorage.setItem("storybook_cover", data.cover_image || "");
+      } else {
+        throw new Error("Invalid story response");
       }
-
-      localStorage.setItem("storybook_title", data.title);
-      localStorage.setItem("storybook_pages", JSON.stringify(data.pages));
-      localStorage.setItem("storybook_cover", data.cover_image || "");
     } catch (err) {
-      console.error("Story generation failed. Using fallback content.", err);
-
-      // Fallback/default story content
-      localStorage.setItem("storybook_title", "Oops! No Story Found");
+      console.error("Error:", err);
+      localStorage.setItem("storybook_title", "Oops!");
       localStorage.setItem("storybook_pages", JSON.stringify([
-        {
-          text: "We couldn't generate your story due to a technical issue. Please try again later.",
-          image_url: ""
-        }
+        { text: "There was a problem generating your story. Please try again later.", image_url: "" }
       ]));
       localStorage.setItem("storybook_cover", "");
     } finally {
