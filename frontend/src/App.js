@@ -55,25 +55,35 @@ function App() {
     setLoading(true);
     try {
       const response = await fetch('https://kidlit-ai-backend.onrender.com/generate_story', {
-
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name, age, theme })
       });
 
       const data = await response.json();
-      if (!data.title || !data.pages) throw new Error("Invalid story");
+
+      if (!data.title || !data.pages) {
+        throw new Error("Invalid story structure");
+      }
 
       localStorage.setItem("storybook_title", data.title);
       localStorage.setItem("storybook_pages", JSON.stringify(data.pages));
       localStorage.setItem("storybook_cover", data.cover_image || "");
-
-      navigate("/storybook");
     } catch (err) {
-      console.error("Error:", err);
-      alert("Failed to generate story. Try again.");
+      console.error("Story generation failed. Using fallback content.", err);
+
+      // Fallback/default story content
+      localStorage.setItem("storybook_title", "Oops! No Story Found");
+      localStorage.setItem("storybook_pages", JSON.stringify([
+        {
+          text: "We couldn't generate your story due to a technical issue. Please try again later.",
+          image_url: ""
+        }
+      ]));
+      localStorage.setItem("storybook_cover", "");
     } finally {
       setLoading(false);
+      navigate("/storybook");
     }
   };
 
