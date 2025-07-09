@@ -20,6 +20,11 @@ chat_client = ChatCompletionsClient(endpoint=AZURE_ENDPOINT, credential=credenti
 
 @app.route("/", methods=["GET"])
 def home():
+    return "Backend is running!", 200
+
+
+@app.route("/", methods=["GET"])
+def home():
     return "🎉 KidLit AI Backend is running!"
 
 @app.route("/generate_story", methods=["POST"])
