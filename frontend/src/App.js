@@ -1,9 +1,10 @@
-import React, { useState, useRef } from 'react';
+import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, useNavigate } from "react-router-dom";
 import StoryBookPage from './StoryBookPage';
+import FullscreenBook from './FullscreenBook';
 import './App.css';
 
-function HomePage({ onGenerateStory, name, setName, age, setAge, theme, setTheme, loading, handleCameraUpload, openCameraUpload, fileInputRef }) {
+function HomePage({ onGenerateStory, name, setName, age, setAge, theme, setTheme, loading }) {
   const handleSubmit = (e) => {
     e.preventDefault();
     onGenerateStory();
@@ -12,7 +13,7 @@ function HomePage({ onGenerateStory, name, setName, age, setAge, theme, setTheme
   return (
     <div className="app-container">
       <h2>📚 KidLit AI</h2>
-      <form onSubmit={handleSubmit} style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', justifyContent: 'center', alignItems: 'center' }}>
+      <form onSubmit={handleSubmit}>
         <input
           placeholder="Child's Name"
           value={name}
@@ -29,18 +30,6 @@ function HomePage({ onGenerateStory, name, setName, age, setAge, theme, setTheme
           value={theme}
           onChange={e => setTheme(e.target.value)}
         />
-
-        <button type="button" onClick={openCameraUpload} style={smallCircleButtonStyle}>📷</button>
-
-        <input
-          ref={fileInputRef}
-          type="file"
-          accept="image/*"
-          capture="environment"
-          style={{ display: 'none' }}
-          onChange={handleCameraUpload}
-        />
-
         <button type="submit" disabled={loading}>
           {loading ? "Generating..." : "Generate Story"}
         </button>
@@ -55,7 +44,6 @@ function App() {
   const [theme, setTheme] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-  const fileInputRef = useRef();
 
   const generateStory = async () => {
     if (!name.trim() || !age.trim() || !theme.trim()) {
@@ -93,40 +81,6 @@ function App() {
     }
   };
 
-  const openCameraUpload = () => {
-    fileInputRef.current.click();
-  };
-
-  const handleCameraUpload = async (event) => {
-    const file = event.target.files[0];
-    if (!file) return;
-
-    const formData = new FormData();
-    formData.append("image", file);
-
-    setLoading(true);
-    try {
-      const response = await fetch("https://kidlit-ai-backend.onrender.com/generate_story", {
-        method: "POST",
-        body: formData
-      });
-
-      const result = await response.json();
-      const { title, cover_image_url, pages } = result;
-
-      localStorage.setItem("storybook_title", title);
-      localStorage.setItem("storybook_cover", cover_image_url);
-      localStorage.setItem("storybook_pages", JSON.stringify(pages));
-
-      navigate("/storybook");
-    } catch (error) {
-      alert("Error generating story from image.");
-      console.error(error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   return (
     <Routes>
       <Route path="/" element={
@@ -136,32 +90,13 @@ function App() {
           age={age} setAge={setAge}
           theme={theme} setTheme={setTheme}
           loading={loading}
-          handleCameraUpload={handleCameraUpload}
-          openCameraUpload={openCameraUpload}
-          fileInputRef={fileInputRef}
         />
       } />
       <Route path="/storybook" element={<StoryBookPage />} />
+      <Route path="/fullscreen" element={<FullscreenBook />} />
     </Routes>
   );
 }
-
-const smallCircleButtonStyle = {
-  background: "#fff8f0",
-  border: "2px solid #ffa0c2",
-  borderRadius: "50%",
-  width: "50px",
-  height: "50px",
-  fontSize: "19px",
-  lineHeight: "40px",           // Ensures vertical centering
-  textAlign: "center",          // Ensures horizontal centering
-  verticalAlign: "middle",
-  padding: "0",                 // Removes default padding
-  cursor: "pointer",
-  boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
-  display: "inline-block"
-};
-
 
 export default function WrappedApp() {
   return (
