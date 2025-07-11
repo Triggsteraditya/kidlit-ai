@@ -13,8 +13,7 @@ function StoryBookPage() {
   const [rate, setRate] = useState(1);
   const [showCover, setShowCover] = useState(true);
   const [showThanks, setShowThanks] = useState(false);
-  const [resumePageIndex, setResumePageIndex] = useState(null);
-  const [resumeWordIndex, setResumeWordIndex] = useState(null);
+  const [resumeFromWord, setResumeFromWord] = useState(0);
 
   const title = localStorage.getItem("storybook_title") || "";
   const coverImage = localStorage.getItem("storybook_cover") || "";
@@ -29,83 +28,52 @@ function StoryBookPage() {
     setShowCover(false);
 
     const total = pages.length;
-    let pageIndex = resumePageIndex !== null ? resumePageIndex : 0;
-    let wordIndex = resumeWordIndex !== null ? resumeWordIndex : 0;
+    let pageIndex = currentPage - 1;
+    if (pageIndex < 0 || pageIndex >= total) pageIndex = 0;
 
     const readPage = () => {
-      const currentText = pages[pageIndex]?.text || "";
-      const words = currentText.split(/\s+/);
-      const remainingText = words.slice(wordIndex).join(" ");
+      const text = pages[pageIndex]?.text || "";
+      const words = text.split(" ");
+      let wordIndex = resumeFromWord || 0;
 
-      const utterance = new SpeechSynthesisUtterance(remainingText);
-      utterance.rate = rate;
-
-      const hindiVoice = window.speechSynthesis.getVoices().find(v =>
-        v.lang === 'hi-IN' && v.name.includes('Google')
-      );
-      if (hindiVoice) utterance.voice = hindiVoice;
-
-      const pageEls = document.querySelectorAll('.page');
-      const pageEl = pageEls[pageIndex + 1];
-      const textEl = pageEl.querySelector('.page-text');
-
-      if (textEl) {
-        textEl.innerHTML = words.map((word, i) => `<span class="word">${word}</span>`).join(" ");
-      }
-
-      utterance.onboundary = (event) => {
-        if (event.name === "word" && textEl) {
-          const charIndex = event.charIndex;
-          const preText = remainingText.substring(0, charIndex);
-          wordIndex = wordIndex + preText.trim().split(/\s+/).length - 1;
-
-          const wordSpans = textEl.querySelectorAll(".word");
-          wordSpans.forEach((span, i) => {
-            span.style.backgroundColor = i === wordIndex ? "#ffff99" : "transparent";
-          });
+      const speakNextWord = () => {
+        if (wordIndex >= words.length) {
+          pageIndex++;
+          setResumeFromWord(0);
+          if (pageIndex < total) {
+            bookRef.current.pageFlip().flipNext();
+            setTimeout(readPage, 500);
+          } else {
+            setIsReading(false);
+          }
+          return;
         }
+
+        const word = words[wordIndex];
+        const utterance = new SpeechSynthesisUtterance(word);
+        utterance.rate = rate;
+        const hindiVoice = window.speechSynthesis.getVoices().find(v => v.lang === 'hi-IN' && v.name.includes('Google'));
+        if (hindiVoice) utterance.voice = hindiVoice;
+
+        utterance.onend = () => {
+          setResumeFromWord(prev => prev + 1);
+          wordIndex++;
+          speakNextWord();
+        };
+
+        window.speechSynthesis.speak(utterance);
       };
 
-      utterance.onend = () => {
-        if (textEl) {
-          const wordSpans = textEl.querySelectorAll(".word");
-          wordSpans.forEach(span => span.style.backgroundColor = "transparent");
-        }
-
-        pageIndex++;
-        wordIndex = 0;
-
-        if (pageIndex < total) {
-          bookRef.current.pageFlip().flipNext();
-
-          const onFlip = () => {
-            bookRef.current.pageFlip().off("flip", onFlip);
-            readPage();
-          };
-          bookRef.current.pageFlip().on("flip", onFlip);
-        } else {
-          setIsReading(false);
-          setResumePageIndex(null);
-          setResumeWordIndex(null);
-        }
-      };
-
-      window.speechSynthesis.speak(utterance);
+      speakNextWord();
     };
 
     bookRef.current.pageFlip().flip(pageIndex + 1);
-    const onStartFlip = () => {
-      bookRef.current.pageFlip().off("flip", onStartFlip);
-      readPage();
-    };
-    bookRef.current.pageFlip().on("flip", onStartFlip);
+    setTimeout(readPage, 500);
   };
 
   const stopReading = () => {
     window.speechSynthesis.cancel();
     setIsReading(false);
-    setResumePageIndex(currentPage - 1);
-    setResumeWordIndex(resumeWordIndex);
   };
 
   const downloadPDF = () => {
@@ -141,8 +109,106 @@ function StoryBookPage() {
   }, [handleKeyDown, pages.length]);
 
   return (
-    // your JSX and UI logic remains the same
+    <>
+      <div style={{ position: "fixed", top: "10px", left: "10px", display: "flex", flexWrap: "wrap", gap: "10px", zIndex: 1000 }}>
+        <button onClick={() => navigate("/")} style={buttonStyle}>🏠 Home</button>
+        <button onClick={readStory} disabled={isReading} style={buttonStyle}>📖 Read</button>
+        <button onClick={stopReading} disabled={!isReading} style={buttonStyle}>🛑 Stop</button>
+        <button onClick={downloadPDF} style={buttonStyle}>💾 PDF</button>
+        <button onClick={decreaseRate} style={circleButtonStyle}>➖</button>
+        <button onClick={increaseRate} style={circleButtonStyle}>➕</button>
+        <span style={{ alignSelf: "center", fontWeight: "bold", marginLeft: "10px" }}>🔊 {rate.toFixed(1)}x | Page {currentPage + 1}/{totalPages}</span>
+      </div>
+
+      <div style={{ height: "100vh", width: "100vw", display: "flex", justifyContent: "center", alignItems: "center" }}>
+        <div style={{ position: "absolute", left: "50px", top: "50%", transform: "translateY(-50%)", display: "flex", alignItems: "center", gap: "20px", opacity: showCover ? 1 : 0, transition: "opacity 1s ease" }}>
+          <img src="/kidlit_robot.png" alt="KidLit AI Robot" className="robot" style={{ width: "400px", marginLeft: "120px", marginTop: "80px", height: "auto" }} />
+          <div className="speech-bubble">
+            <strong>Hey there!👋 I’m KidLit Ai🤖. Let’s read your story together buddy 🫂!</strong>
+          </div>
+        </div>
+
+        <HTMLFlipBook
+          ref={bookRef}
+          width={600}
+          height={400}
+          size="fixed"
+          showCover={true}
+          mobileScrollSupport={true}
+          onFlip={(e) => {
+            setCurrentPage(e.data);
+            setShowCover(e.data === 0);
+            if (e.data === totalPages - 1) setShowThanks(true);
+            else setShowThanks(false);
+          }}
+        >
+          <div className="page" style={{ ...pageStyle, backgroundImage: `url(${coverImage})`, backgroundSize: "cover", backgroundPosition: "center", color: "#fff", textShadow: "2px 2px 6px #000" }}>
+            <h1 style={{ fontSize: "50px", padding: "20px", textAlign: "center", marginTop: "90px" }}>{title}</h1>
+          </div>
+
+          {pages.map((page, index) => (
+            <div key={index} className="page" style={pageStyle}>
+              {page.image_url && (
+                <img src={page.image_url} alt="Page Illustration" style={{ maxWidth: "90%", maxHeight: "180px", marginBottom: "15px", borderRadius: "10px", boxShadow: "0 5px 15px rgba(0,0,0,0.3)" }} />
+              )}
+              <p style={{ fontSize: "30px", textAlign: "center", margin: "30px", wordWrap: "break-word", wordBreak: "break-word", maxWidth: "90%", overflowY: "auto" }}>
+                {page.text}
+              </p>
+            </div>
+          ))}
+
+          <div className="page" style={{ ...pageStyle, justifyContent: "center", alignItems: "center" }}>
+            <h2 style={{ fontSize: "clamp(36px, 6vw, 60px)", color: "#000000", textAlign: "center", marginTop: "150px" }}>
+              The End
+            </h2>
+          </div>
+        </HTMLFlipBook>
+
+        <div style={{ position: "absolute", right: "30px", top: "50%", transform: "translateY(-50%)", display: "flex", alignItems: "center", gap: "10px", opacity: showThanks ? 1 : 0, pointerEvents: showThanks ? "auto" : "none", transition: "opacity 1s ease" }}>
+          <img src="/kidlitrobot.png" alt="KidLit AI Robot" className="robot" style={{ width: "400px", marginTop: "70px", height: "auto", marginRight: "0px" }} />
+          <div className="speech-bubble-two" style={{ marginLeft: "-10px" }}>
+            <strong>
+              Thanks buddy! 🎉🎉🎉<br />
+              You’ve completed the story.<br />
+              Go Home 🏠 to Generate more stories🤩!
+            </strong>
+          </div>
+        </div>
+      </div>
+    </>
   );
 }
+
+const buttonStyle = {
+  background: "#fce4ec",
+  border: "1px solid #f8bbd0",
+  padding: "8px 15px",
+  borderRadius: "15px",
+  cursor: "pointer"
+};
+
+const circleButtonStyle = {
+  background: "#fce4ec",
+  border: "1px solid #f8bbd0",
+  padding: "8px",
+  borderRadius: "50%",
+  width: "40px",
+  height: "40px",
+  textAlign: "center",
+  cursor: "pointer"
+};
+
+const pageStyle = {
+  padding: "20px",
+  background: "#fff8f0",
+  borderRadius: "15px",
+  boxShadow: "0 0 10px #f3c7b5",
+  display: "flex",
+  flexDirection: "column",
+  justifyContent: "center",
+  alignItems: "center",
+  height: "100%",
+  overflow: "hidden"
+};
 
 export default StoryBookPage;
