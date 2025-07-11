@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, useNavigate } from "react-router-dom";
 import StoryBookPage from './StoryBookPage';
-import FullscreenBook from './FullscreenBook';
 import './App.css';
 
 function HomePage({ onGenerateStory, name, setName, age, setAge, theme, setTheme, loading }) {
@@ -99,7 +98,6 @@ function App() {
         />
       } />
       <Route path="/storybook" element={<StoryBookPage />} />
-      <Route path="/fullscreen" element={<FullscreenBook />} />
     </Routes>
   );
 }
