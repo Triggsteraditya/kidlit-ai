@@ -13,7 +13,8 @@ function StoryBookPage() {
   const [rate, setRate] = useState(1);
   const [showCover, setShowCover] = useState(true);
   const [showThanks, setShowThanks] = useState(false);
-  const [resumeFromWord, setResumeFromWord] = useState(0);
+  const [highlightedWord, setHighlightedWord] = useState("");
+  const [highlightedIndex, setHighlightedIndex] = useState(null);
 
   const title = localStorage.getItem("storybook_title") || "";
   const coverImage = localStorage.getItem("storybook_cover") || "";
@@ -27,44 +28,54 @@ function StoryBookPage() {
     setIsReading(true);
     setShowCover(false);
 
-    const total = pages.length;
     let pageIndex = currentPage - 1;
-    if (pageIndex < 0 || pageIndex >= total) pageIndex = 0;
+    if (pageIndex < 0 || pageIndex >= pages.length) pageIndex = 0;
 
     const readPage = () => {
-      const text = pages[pageIndex]?.text || "";
-      const words = text.split(" ");
-      let wordIndex = resumeFromWord || 0;
+      const pageText = pages[pageIndex]?.text || "";
+      const chunks = pageText.match(/[^.!?]+[.!?]+/g) || [pageText]; // sentences
 
-      const speakNextWord = () => {
-        if (wordIndex >= words.length) {
+      let chunkIndex = 0;
+
+      const speakChunk = () => {
+        if (chunkIndex >= chunks.length) {
           pageIndex++;
-          setResumeFromWord(0);
-          if (pageIndex < total) {
+          if (pageIndex < pages.length) {
             bookRef.current.pageFlip().flipNext();
-            setTimeout(readPage, 500);
+            setTimeout(readPage, 1000);
           } else {
             setIsReading(false);
+            setHighlightedWord("");
           }
           return;
         }
 
-        const word = words[wordIndex];
-        const utterance = new SpeechSynthesisUtterance(word);
+        const textChunk = chunks[chunkIndex].trim();
+        const words = textChunk.split(" ");
+        let wordPos = 0;
+
+        const utterance = new SpeechSynthesisUtterance(textChunk);
         utterance.rate = rate;
-        const hindiVoice = window.speechSynthesis.getVoices().find(v => v.lang === 'hi-IN' && v.name.includes('Google'));
-        if (hindiVoice) utterance.voice = hindiVoice;
+        const voice = window.speechSynthesis.getVoices().find(v => v.lang === 'hi-IN' || v.lang.startsWith('en'));
+        if (voice) utterance.voice = voice;
+
+        utterance.onboundary = (event) => {
+          if (event.name === "word") {
+            setHighlightedIndex(pageIndex);
+            setHighlightedWord(words[wordPos] || "");
+            wordPos++;
+          }
+        };
 
         utterance.onend = () => {
-          setResumeFromWord(prev => prev + 1);
-          wordIndex++;
-          speakNextWord();
+          chunkIndex++;
+          speakChunk();
         };
 
         window.speechSynthesis.speak(utterance);
       };
 
-      speakNextWord();
+      speakChunk();
     };
 
     bookRef.current.pageFlip().flip(pageIndex + 1);
@@ -74,6 +85,7 @@ function StoryBookPage() {
   const stopReading = () => {
     window.speechSynthesis.cancel();
     setIsReading(false);
+    setHighlightedWord("");
   };
 
   const downloadPDF = () => {
@@ -121,13 +133,6 @@ function StoryBookPage() {
       </div>
 
       <div style={{ height: "100vh", width: "100vw", display: "flex", justifyContent: "center", alignItems: "center" }}>
-        <div style={{ position: "absolute", left: "50px", top: "50%", transform: "translateY(-50%)", display: "flex", alignItems: "center", gap: "20px", opacity: showCover ? 1 : 0, transition: "opacity 1s ease" }}>
-          <img src="/kidlit_robot.png" alt="KidLit AI Robot" className="robot" style={{ width: "400px", marginLeft: "120px", marginTop: "80px", height: "auto" }} />
-          <div className="speech-bubble">
-            <strong>Hey there!👋 I’m KidLit Ai🤖. Let’s read your story together buddy 🫂!</strong>
-          </div>
-        </div>
-
         <HTMLFlipBook
           ref={bookRef}
           width={600}
@@ -152,7 +157,11 @@ function StoryBookPage() {
                 <img src={page.image_url} alt="Page Illustration" style={{ maxWidth: "90%", maxHeight: "180px", marginBottom: "15px", borderRadius: "10px", boxShadow: "0 5px 15px rgba(0,0,0,0.3)" }} />
               )}
               <p style={{ fontSize: "30px", textAlign: "center", margin: "30px", wordWrap: "break-word", wordBreak: "break-word", maxWidth: "90%", overflowY: "auto" }}>
-                {page.text}
+                {page.text.split(" ").map((word, i) => (
+                  <span key={i} style={{ backgroundColor: highlightedIndex === index && highlightedWord === word ? "#ffff00" : "transparent" }}>
+                    {word + " "}
+                  </span>
+                ))}
               </p>
             </div>
           ))}
@@ -163,17 +172,6 @@ function StoryBookPage() {
             </h2>
           </div>
         </HTMLFlipBook>
-
-        <div style={{ position: "absolute", right: "30px", top: "50%", transform: "translateY(-50%)", display: "flex", alignItems: "center", gap: "10px", opacity: showThanks ? 1 : 0, pointerEvents: showThanks ? "auto" : "none", transition: "opacity 1s ease" }}>
-          <img src="/kidlitrobot.png" alt="KidLit AI Robot" className="robot" style={{ width: "400px", marginTop: "70px", height: "auto", marginRight: "0px" }} />
-          <div className="speech-bubble-two" style={{ marginLeft: "-10px" }}>
-            <strong>
-              Thanks buddy! 🎉🎉🎉<br />
-              You’ve completed the story.<br />
-              Go Home 🏠 to Generate more stories🤩!
-            </strong>
-          </div>
-        </div>
       </div>
     </>
   );
