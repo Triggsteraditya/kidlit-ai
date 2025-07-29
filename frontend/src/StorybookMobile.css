@@ -1,0 +1,204 @@
+
+  .apk-main {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 1rem 1rem;
+    gap: 2rem;
+    transform: scale(0.8);
+    opacity: 0;
+    animation: popBubble 0.6s ease-out forwards;
+
+  }
+
+.apk-container {
+  padding: 2rem;
+}
+
+.apk-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 5px;
+  margin-bottom: 0.1rem;
+  transform: scale(0.8);
+  opacity: 0;
+  animation: popBubble 0.6s ease-out forwards;
+}
+
+.logo1-section {
+  display: flex;
+  flex-direction: center;
+  text-align: center;
+  align-items: center;
+  gap: 1px;
+  transform-origin: top center;
+  overflow: hidden;
+    opacity: 0;
+    margin: auto;
+    animation: popBubble 0.6s ease-out forwards;
+}
+
+.logo1-icon {
+  height: 50px;
+  filter: drop-shadow(0 0 1px #ff9595);
+  margin-left: 80px;
+  
+}
+
+.logo1-text {
+  font-size: 52px;
+  color: #ff9595;
+  font-weight: bold;
+  text-shadow: 1px 2px 1.5px rgba(63, 63, 63, 0.3);
+ 
+  margin-left: 10px;
+  font-family: 'Fredoka', sans-serif;
+}
+
+.logo1-link {
+  text-decoration: none;
+  color: inherit;
+}
+
+
+button {
+  font-family: 'Fredoka', sans-serif;
+}
+
+body {
+  overflow: hidden;
+}
+
+
+
+
+.main-body1 {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 1rem;
+  gap: 1rem;
+}
+
+.story-box1 {
+  width: 80vw;
+  height: 60vh;
+  background-color: #fff8f0;
+  margin-top: -2rem;
+  border-radius: 20px;
+  border: 3px solid #000000;
+  padding: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-image: url('./assets/paper-bg.png');
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+.story-content1 {
+  font-weight: bold;
+  width: 100%;
+  height: 100%;
+}
+
+.story-title1 {
+  font-family: 'Schoolbell', cursive;
+  font-size: 2rem;
+  font-weight: bold;
+  text-shadow: 1px 1px #e0d4b7;
+  color: #000000;  
+  text-align: center;
+
+}
+
+.story-text1 {
+  font-family: 'Schoolbell', cursive;
+  font-size: 1.1rem;
+  line-height: 1.5;
+  text-align: justify;
+  text-shadow: 1px 1px #ffffff;
+  padding: 0.5rem;
+  word-break: break-word;
+  overflow: hidden;
+}
+
+.story-end1 {
+  font-family: 'Schoolbell', cursive;
+  font-size: 3rem;
+  color: #000000;
+  text-align: center;
+  margin-top: 3rem;
+  text-shadow: 1px 1px #000000;
+}
+
+.story-content1 h2 {
+  margin-top: 200px;
+  font-size: 2.5em;
+  font-weight: bold;
+  text-shadow: 1px 1px #ffffff;
+  margin-bottom: 1rem;
+}
+
+.side-buttons1 {
+display: none;
+}
+
+.audio-button-containers {
+  display: flex;
+  flex: fixed;
+  text-align: center;
+  margin-top: -15vh;
+  margin-left: 38vh ;
+  flex-direction: row;
+  gap: 0.5rem;
+}
+
+.aud-icon1,.quiz-icon1{
+  width: 35px;
+  height: 35px;
+  border-radius: 50%;
+  align-items: center;
+  border: 1px solid #000000;
+
+}
+
+.page-controls1 {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.page-controls1 button {
+  background-color: #ff9595;
+  border: none;
+  border-radius: 50%;
+  padding: 1rem;
+  font-size: 1rem;
+  color: white;
+  cursor: pointer;
+}
+
+.page-controls1 button:hover {
+  background-color: #ff6b6b;
+}
+
+.page-controls1 button:disabled {
+  background-color: #ffd3d3;
+  cursor: not-allowed;
+}
+
+.fade-in {
+  opacity: 1;
+  transition: opacity 0.3s ease-in;
+}
+
+.fade-out {
+  opacity: 0;
+  transition: opacity 0.3s ease-out;
+}
+

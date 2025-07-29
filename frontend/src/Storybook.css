@@ -1,0 +1,238 @@
+
+
+
+.main-body {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 0.5rem;
+  padding: 1rem;
+}
+
+
+.robot-section {
+  flex: 1;
+  text-align: center;
+  padding-left: 3rem;
+}
+
+.robot-img {
+  width: 400px;
+  margin-top: 5rem;
+  margin-left: 200px;
+}
+
+.bubble {
+  position: absolute;
+  top: 100px;
+  left: 200px;
+  background-color: #ff9595;
+  color: white;
+  font-weight: bold;
+  text-align: left;
+  font-size: 1.3rem;
+  font-family: 'Fredoka', sans-serif;
+  margin-right: 130px;
+  padding: 10px 10px;
+  border-radius: 30px 30px 0px 30px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  max-width: 180px;
+  transform: scale(0.8);
+  opacity: 0;
+  animation: popBubble 0.6s ease-out forwards;
+}
+
+.bubble::after {
+  content: "";
+  position: absolute;
+  bottom: -12px; 
+  left: 20px;     
+  width: 0;
+  height: 0;
+  border: 12px solid transparent;
+  border-top-color: #ff9595;
+}
+
+.audio-button-container {
+  display: flex;
+  text-align: center;
+  margin: 2rem 0;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.audio-mode-btn, .quiz-button {
+  border: none;
+  padding: 1px 1px;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: 0.2s ease;
+  box-shadow: 0 0 0 rgba(0, 0, 0, 0); 
+}
+
+.audio-mode-btn :hover {
+  box-shadow: 0 0 2px 1px #f76c6c;
+}
+
+
+.quiz-button :hover {
+  box-shadow: 0 0 2px 1px #f76c6c;
+}
+
+.aud-icon,.quiz-icon{
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  align-items: center;
+  border: 1px solid #000000;
+
+}
+
+.story-box {
+  position: relative;
+  flex: 1;
+  max-width: 600px;
+  height: 400px;
+  size: fixed;
+  background-color: #fff8f0;
+  margin-right: 1rem;
+  border-radius: 20px;
+  padding: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 3px solid #000000;
+  background-image: url('./assets/paper-bg.png');
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+.story-content {
+  font-weight: bold;
+  margin-top: -80px;
+  width: 100%;
+  height: 100%;
+}
+
+.story-title {
+  font-family: 'Schoolbell', cursive;
+  font-size: 40px;
+  font-weight: bold;
+  text-shadow: 1px 1px #e0d4b7;
+  color: #000000;  
+  text-align: center;
+  margin-top: 150px;
+}
+
+.story-text {
+  font-family: 'Schoolbell', cursive;
+  font-size: 1.4rem;
+  line-height: 1.7;
+  text-align: justify;
+  text-shadow: 1px 1px #ffffff;
+  padding: 1rem;
+  max-height: 100%;             /* 👈 Allow full box height */
+  overflow: hidden;            /* Hide anything beyond */
+  word-break: break-word;      /* Wrap long words if needed */
+}
+
+.story-end {
+  font-family: 'Schoolbell', cursive;
+  font-size: 5rem;        /* 🎯 You can increase or decrease this */
+  color: #000000;
+  text-align: center;
+  margin-top: 150px;
+  text-shadow: 1px 1px #000000;
+}
+
+
+
+
+.story-content h2 {
+  font-size: 3rem;
+  font-weight: bold;
+  text-shadow: 1px 1px #ffffff;
+  margin-bottom: 1rem;
+  margin-top: 200px;
+}
+
+.side-buttons {
+  position: absolute;
+  top: 100px;
+  right: -70px;
+  display: flex;
+  flex-direction: column;
+  gap: 4rem;
+}
+
+.side-buttons button {
+  background-color: #ff9595;
+  border: none;
+  border-radius: 25px;
+  padding: 0.7rem 1rem;
+  font-weight: bold;
+  text-align: center;
+  color: white;
+  cursor: pointer;
+  width: 60px;
+  transition: background-color 0.3s ease;
+}
+
+.side-buttons button:hover {
+  background-color: #ff6e6e;
+}
+
+.page-controls {
+  display: flex;
+  justify-content: center;
+  margin-top: 2rem;
+  gap: 2rem;
+}
+
+.page-controls button {
+  background-color: #ff9595;
+  border: none;
+  border-radius: 50%;
+  padding: 1.2rem;
+  font-size: 1.2rem;
+  color: white;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.page-controls button:hover {
+  background-color: #ff6b6b;
+}
+
+.page-controls button:disabled {
+  background-color: #ffd3d3;
+  cursor: not-allowed;
+}
+
+.fade-in {
+  opacity: 1;
+  transition: opacity 0.3s ease-in;
+}
+
+.fade-out {
+  opacity: 0;
+  transition: opacity 0.3s ease-out;
+}
+
+.highlight-word {
+  transition: color 0.3s ease, background-color 0.3s ease;
+  color: black;
+}
+
+.highlight-word.highlight-active {
+  color: #ff6b6b;
+  font-weight: bold;
+}
+.highlight-faded {
+  color: #999;
+}
+
+
+
