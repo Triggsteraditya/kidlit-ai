@@ -165,10 +165,13 @@ def generate_quiz():
     import json
 
     data = request.get_json()
-    story_text = data.get('story')
+    story_text_raw = data.get('story')
 
-    if not story_text:
+    if not story_text_raw:
         return jsonify({'error': 'No story text provided'}), 400
+
+    # Handle both list and string
+    story_text = story_text_raw if isinstance(story_text_raw, str) else " ".join(story_text_raw)
 
     prompt = f"""
 Based on the following children's story, generate 3 multiple-choice questions.
@@ -180,7 +183,7 @@ Each question should have:
 Respond in valid JSON format as a list of objects.
 
 Story:
-\"\"\"{story_text}\"\"\"
+\"\"\"{story_text}\"\"\" 
 """
 
     headers = {
@@ -201,17 +204,14 @@ Story:
         result = response.json()
         content = result["choices"][0]["message"]["content"]
 
-        # Attempt JSON parsing
         try:
             quiz_data = json.loads(content)
         except json.JSONDecodeError:
             try:
-                # Try extracting content inside [ ... ]
                 match = re.search(r'\[[\s\S]+?\]', content)
                 if match:
                     quiz_data = json.loads(match.group(0))
                 else:
-                    # Last resort: use literal_eval
                     quiz_data = literal_eval(content)
             except Exception as e:
                 print("Parsing failure:", content)
@@ -222,6 +222,7 @@ Story:
     except Exception as e:
         print("Quiz Generation Error:", e)
         return jsonify({'error': str(e)}), 500
+
 
 
 if __name__ == '__main__':
