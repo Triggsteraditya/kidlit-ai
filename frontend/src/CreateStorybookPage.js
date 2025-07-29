@@ -53,7 +53,7 @@ const handleGenerate = async () => {
   try {
     if (name || ageGroup) {
       const prompt = buildPrompt();
-      const res = await fetch('/api/generate-story', {
+      const res = await fetch('https://kidlit-ai.onrender.com/api/generate-story', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ prompt, language })
@@ -67,7 +67,7 @@ const handleGenerate = async () => {
       formData.append('photo', photo);
       formData.append('theme', selectedTheme);
       formData.append('language', language);
-      const res = await fetch('/api/generate-from-photo', {
+      const res = await fetch('https://kidlit-ai.onrender.com/api/generate-from-photo', {
         method: 'POST',
         body: formData
       });
