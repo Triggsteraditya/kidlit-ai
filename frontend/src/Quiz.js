@@ -24,13 +24,21 @@ const Quiz = () => {
     })
       .then(res => res.json())
       .then(data => {
-        if (data.quiz) {
-          setQuestions(data.quiz);
-        } else if (data.questions) {
-          setQuestions(data.questions); // fallback
-        } else {
-          setError('No quiz questions received.');
-        }
+          if (data.quiz) {
+            setQuestions(data.quiz);
+          } else if (data.questions) {
+            setQuestions(data.questions); // fallback
+          } else if (data.raw) {
+            try {
+              const extracted = JSON.parse(data.raw);
+              setQuestions(extracted);
+            } catch (e) {
+              setError('Received malformed quiz JSON.');
+            }
+          } else {
+            setError('No quiz questions received.');
+          }
+
         setLoading(false);
       })
       .catch(err => {
