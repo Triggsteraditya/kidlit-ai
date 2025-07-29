@@ -161,6 +161,9 @@ def generate_from_photo():
 
 @app.route('/api/generate-quiz', methods=['POST'])
 def generate_quiz():
+    from ast import literal_eval
+    import json
+
     data = request.get_json()
     story_text = data.get('story')
 
@@ -198,16 +201,20 @@ Story:
         result = response.json()
         content = result["choices"][0]["message"]["content"]
 
-        # Try parsing JSON directly and safely
-        import json
+        # Attempt JSON parsing
         try:
             quiz_data = json.loads(content)
         except json.JSONDecodeError:
-            # Try to extract JSON part if model wrapped it in text
-            match = re.search(r'\[.*?\]', content, re.DOTALL)
-            if match:
-                quiz_data = json.loads(match.group(0))
-            else:
+            try:
+                # Try extracting content inside [ ... ]
+                match = re.search(r'\[[\s\S]+?\]', content)
+                if match:
+                    quiz_data = json.loads(match.group(0))
+                else:
+                    # Last resort: use literal_eval
+                    quiz_data = literal_eval(content)
+            except Exception as e:
+                print("Parsing failure:", content)
                 return jsonify({'error': 'Could not parse quiz JSON', 'raw': content}), 500
 
         return jsonify({'quiz': quiz_data})
@@ -215,7 +222,7 @@ Story:
     except Exception as e:
         print("Quiz Generation Error:", e)
         return jsonify({'error': str(e)}), 500
-    
+
 
 if __name__ == '__main__':
     app.run(debug=True)
