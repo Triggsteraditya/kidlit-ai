@@ -17,7 +17,7 @@ const Quiz = () => {
 
     if (!storyText) return;
 
-    fetch('http://localhost:5000/api/generate-quiz', {
+    fetch('https://kidlit-ai.onrender.com/api/generate-quiz', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ story: storyText, language: lang }),
